@@ -1,4 +1,10 @@
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_oldnames.h>
+#include <SDL3/SDL_render.h>
+#include <SDL3/SDL_surface.h>
+#include <SDL3_image/SDL_image.h>
+#include <cstdio>
 #include <iostream>
 #include "snake.hpp"
 
@@ -33,6 +39,8 @@ int main(int argc, char *argv[]) {
         SDL_Quit();
         return 1;
     }
+
+    SDL_SetRenderVSync(renderer, 1);
 
     // SDL_HideCursor();
 
@@ -99,10 +107,13 @@ void render(SDL_Renderer *renderer, snake &theSnake) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    // Render the apple in red
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_FRect *apple = theSnake.getApple();
-    SDL_RenderFillRect(renderer, apple);
+    // Render the apple with the apple.ppm image
+    SDL_FRect *apple_rect = theSnake.getApple();
+    SDL_Texture *apple_texture = IMG_LoadTexture(renderer, "resources/apple.ppm");
+    SDL_SetTextureScaleMode(apple_texture, SDL_SCALEMODE_NEAREST);
+    SDL_RenderTexture(renderer, apple_texture, NULL, apple_rect);
+    if (!apple_texture)
+        std::cerr << "Failed: " << SDL_GetError();
 
     // These help to animate the snake
     float anim_head = (((float)delta / SPEED_OF_GAME) * SNAKE_SEGMENT_SIZE) - SNAKE_SEGMENT_SIZE;
