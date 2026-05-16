@@ -12,7 +12,10 @@ target_include_directories(snake PRIVATE include)
 target_compile_features(snake PRIVATE cxx_std_17)
 
 find_package(SDL3 REQUIRED)
-target_link_libraries(snake PRIVATE SDL3::SDL3)
+find_package(SDL3_image REQUIRED)
+target_link_libraries(snake PRIVATE 
+    SDL3::SDL3
+    SDL3_image::SDL3_image)
 
 if(APPLE)
     set_target_properties(snake PROPERTIES MACOSX_DEPLOYMENT_TARGET "10.13")

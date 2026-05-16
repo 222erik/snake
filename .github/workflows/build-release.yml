@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Install SDL3 (x86_64)
+      - name: Install SDL3 and SDL3_image (x86_64)
         if: matrix.arch == 'x86_64'
         run: |
           sudo apt-get update
@@ -37,6 +37,14 @@ jobs:
           cmake --build build
           sudo cmake --install build
 
+          cd ..
+          git clone https://github.com/libsdl-org/SDL_image.git
+          cd SDL_image
+
+          cmake -S . -B build -G Ninja
+          cmake --build build
+          sudo cmake --install build
+
           sudo ldconfig
       
       - name: Create build directory
@@ -45,23 +53,28 @@ jobs:
       - name: Configure CMake
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
       
-      - name: Build
-        run: cmake --build build --config Release
-      
+      - name: Build & zip
+        run: |
+          cmake --build build --config Release
+          mv build/snake .
+          zip -r snake-linux.zip resources snake
+          
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: snake-linux-${{ matrix.arch }}
-          path: build/snake
+          name: snake-linux
+          path: snake-linux.zip
 
   build-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       
-      - name: Install SDL3
-        run: vcpkg install sdl3:x64-windows
-      
+      - name: Install SDL3 and SDL3_image
+        run: |
+          vcpkg install sdl3:x64-windows
+          vcpkg install sdl3-image:x64-windows
+
       - name: Create build directory
         run: mkdir build
       
@@ -70,12 +83,19 @@ jobs:
       
       - name: Build
         run: cmake --build build --config Release
+
+      - name: Copy SDL3.dll, SDL3_image.dll and zip
+        run: |
+          copy C:\vcpkg\installed\x64-windows\bin\SDL3.dll .
+          copy C:\vcpkg\installed\x64-windows\bin\SDL3_image.dll .
+          move build\Release/snake.exe .
+          tar -a -c -f snake-windows.zip resources snake.exe SDL3.dll SDL3_image.dll
       
-      - name: Upload artifact
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: snake-windows-x86_64
-          path: build/Release/snake.exe
+          name: snake-windows
+          path: snake-windows.zip
 
   create-release:
     needs: [build-linux, build-windows]
@@ -88,5 +108,5 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            snake-linux-*/*
-            snake-windows-*/*
+            snake-linux*/*
+            snake-windows*/*
