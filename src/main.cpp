@@ -9,7 +9,7 @@
 #include <iostream>
 #include "snake.hpp"
 
-#define SPEED_OF_GAME 150 // Delay in milliseconds between each game update (lower is faster)
+#define SPEED_OF_GAME 200 // Delay in milliseconds between each game update (lower is faster)
 #define REFRESH_RATE 60   // Target refresh rate for rendering (frames per second)
 
 void render(SDL_Renderer *renderer, snake &theSnake);
@@ -125,10 +125,24 @@ void render(SDL_Renderer *renderer, snake &theSnake) {
 
     // Render the snake
 
-    // Render the body with the snake_body.ppm image
+    // Animate the body with the snake_body.ppm image
     std::vector<SDL_FRect> body_rects;
     for (int i = 1; i <= body.size() - 2; ++i) {
-        body_rects.push_back(body.data()[i]);
+        SDL_FRect body_rect = body.data()[i];
+        if (body[i - 1].y == body_rect.y) {
+            if (body[i - 1].x < body_rect.x) {
+                body_rect.x -= anim_tail;
+            } else {
+                body_rect.x += anim_tail;
+            }
+        } else {
+            if (body[i - 1].y < body_rect.y) {
+                body_rect.y -= anim_tail;
+            } else {
+                body_rect.y += anim_tail;
+            }
+        }
+        body_rects.push_back(body_rect);
     }
     SDL_Texture *body_texture = IMG_LoadTexture(renderer, "resources/snake_body.ppm");
     SDL_SetTextureScaleMode(body_texture, SDL_SCALEMODE_NEAREST);
