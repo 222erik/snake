@@ -129,23 +129,24 @@ void render(SDL_Renderer *renderer, snake &theSnake) {
     SDL_RenderFillRects(renderer, theSnake.getBody().data() + 1,
                         theSnake.getBody().size() - 2); // Don't render head and tail yet
 
-    // Animate the head in green
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    temp = theSnake.getBody().front();
-    if (body[1].y == temp.y) {
-        if (body[1].x < temp.x) {
-            temp.x += anim_head;
+    // Animate the head with the snake_head.ppm image
+    SDL_FRect head_rect = theSnake.getBody().front();
+    if (body[1].y == head_rect.y) {
+        if (body[1].x < head_rect.x) {
+            head_rect.x += anim_head;
         } else {
-            temp.x -= anim_head;
+            head_rect.x -= anim_head;
         }
     } else {
-        if (body[1].y < temp.y) {
-            temp.y += anim_head;
+        if (body[1].y < head_rect.y) {
+            head_rect.y += anim_head;
         } else {
-            temp.y -= anim_head;
+            head_rect.y -= anim_head;
         }
     }
-    SDL_RenderFillRect(renderer, &temp);
+    SDL_Texture *head_texture = IMG_LoadTexture(renderer, "resources/snake_head.ppm");
+    SDL_SetTextureScaleMode(head_texture, SDL_SCALEMODE_NEAREST);
+    SDL_RenderTexture(renderer, head_texture, NULL, &head_rect);
 
     // The tail of the snake is animated in blue
     SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
