@@ -9,8 +9,8 @@
 #include <iostream>
 #include "snake.hpp"
 
-#define SPEED_OF_GAME 200 // Delay in milliseconds between each game update (lower is faster)
-#define REFRESH_RATE 60   // Target refresh rate for rendering (frames per second)
+#define SPEED_OF_GAME 1000 // Delay in milliseconds between each game update (lower is faster)
+#define REFRESH_RATE 60    // Target refresh rate for rendering (frames per second)
 
 void render(SDL_Renderer *renderer, snake &theSnake);
 
@@ -59,6 +59,7 @@ int main(int argc, char *argv[]) {
     SDL_Event event;
     bool running = true;
     direction = 2; // Start by moving left
+    int tmp_direction;
     while (running) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
@@ -69,16 +70,16 @@ int main(int argc, char *argv[]) {
         const bool *keyboardState = SDL_GetKeyboardState(NULL);
         if ((keyboardState[SDL_SCANCODE_UP] || keyboardState[SDL_SCANCODE_W] ||
              keyboardState[SDL_SCANCODE_DOWN] || keyboardState[SDL_SCANCODE_S]) &&
-            direction > 1) {
-            direction = (keyboardState[SDL_SCANCODE_UP] || keyboardState[SDL_SCANCODE_W])
-                            ? 0
-                            : 1; // Up or Down
+            tmp_direction > 1) {
+            tmp_direction = (keyboardState[SDL_SCANCODE_UP] || keyboardState[SDL_SCANCODE_W])
+                                ? 0
+                                : 1; // Up or Down
         } else if ((keyboardState[SDL_SCANCODE_LEFT] || keyboardState[SDL_SCANCODE_A] ||
                     keyboardState[SDL_SCANCODE_RIGHT] || keyboardState[SDL_SCANCODE_D]) &&
-                   direction < 2) {
-            direction = (keyboardState[SDL_SCANCODE_LEFT] || keyboardState[SDL_SCANCODE_A])
-                            ? 2
-                            : 3; // Left or Right
+                   tmp_direction < 2) {
+            tmp_direction = (keyboardState[SDL_SCANCODE_LEFT] || keyboardState[SDL_SCANCODE_A])
+                                ? 2
+                                : 3; // Left or Right
         }
         // Exit if esc is pressed
         if (keyboardState[SDL_SCANCODE_ESCAPE]) {
@@ -86,6 +87,7 @@ int main(int argc, char *argv[]) {
         }
 
         if (delta == 0) {
+            direction = tmp_direction;
             theSnake.move(direction);
 
             if (theSnake.dead()) {
