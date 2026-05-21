@@ -197,23 +197,30 @@ void render(SDL_Renderer *renderer, snake &theSnake) {
                              SDL_FLIP_NONE);
 
     // The tail of the snake is animated with the snake_tail.ppm image
+    int tail_direction;
     SDL_FRect tail_rect = theSnake.getBody().back();
     if (theSnake.getBody()[theSnake.getBody().size() - 2].y == tail_rect.y) {
         if (theSnake.getBody()[theSnake.getBody().size() - 2].x < tail_rect.x) {
             tail_rect.x -= anim_tail;
+            tail_direction = 180;
         } else {
             tail_rect.x += anim_tail;
+            tail_direction = 0;
         }
     } else {
         if (theSnake.getBody()[theSnake.getBody().size() - 2].y < tail_rect.y) {
             tail_rect.y -= anim_tail;
+            tail_direction = 270;
         } else {
             tail_rect.y += anim_tail;
+            tail_direction = 90;
         }
     }
     SDL_Texture *tail_texture = IMG_LoadTexture(renderer, "resources/snake_tail.ppm");
     SDL_SetTextureScaleMode(tail_texture, SDL_SCALEMODE_NEAREST);
-    SDL_RenderTexture(renderer, tail_texture, NULL, &tail_rect);
+
+    SDL_RenderTextureRotated(renderer, tail_texture, NULL, &tail_rect, tail_direction, &center,
+                             SDL_FLIP_NONE);
 
     SDL_RenderPresent(renderer);
 }
