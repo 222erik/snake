@@ -148,23 +148,24 @@ void render(SDL_Renderer *renderer, snake &theSnake) {
     SDL_SetTextureScaleMode(head_texture, SDL_SCALEMODE_NEAREST);
     SDL_RenderTexture(renderer, head_texture, NULL, &head_rect);
 
-    // The tail of the snake is animated in blue
-    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-    temp = theSnake.getBody().back();
-    if (theSnake.getBody()[theSnake.getBody().size() - 2].y == temp.y) {
-        if (theSnake.getBody()[theSnake.getBody().size() - 2].x < temp.x) {
-            temp.x -= anim_tail;
+    // The tail of the snake is animated with the snake_tail.ppm image
+    SDL_FRect tail_rect = theSnake.getBody().back();
+    if (theSnake.getBody()[theSnake.getBody().size() - 2].y == tail_rect.y) {
+        if (theSnake.getBody()[theSnake.getBody().size() - 2].x < tail_rect.x) {
+            tail_rect.x -= anim_tail;
         } else {
-            temp.x += anim_tail;
+            tail_rect.x += anim_tail;
         }
     } else {
-        if (theSnake.getBody()[theSnake.getBody().size() - 2].y < temp.y) {
-            temp.y -= anim_tail;
+        if (theSnake.getBody()[theSnake.getBody().size() - 2].y < tail_rect.y) {
+            tail_rect.y -= anim_tail;
         } else {
-            temp.y += anim_tail;
+            tail_rect.y += anim_tail;
         }
     }
-    SDL_RenderFillRect(renderer, &temp);
+    SDL_Texture *tail_texture = IMG_LoadTexture(renderer, "resources/snake_tail.ppm");
+    SDL_SetTextureScaleMode(tail_texture, SDL_SCALEMODE_NEAREST);
+    SDL_RenderTexture(renderer, tail_texture, NULL, &tail_rect);
 
     SDL_RenderPresent(renderer);
 }
