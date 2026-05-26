@@ -8,6 +8,10 @@
 #define SCREEN_WIDTH 1300
 #define SCREEN_HEIGHT 700
 
+void loop_coordinates(float *x,
+                      float *y); // This keeps the snake in frame, even though its cooirdinates
+                                 // are outside of the screen (the snake loops in the walls)
+
 class snake {
   private:
     std::vector<SDL_FRect> body;

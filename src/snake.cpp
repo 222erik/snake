@@ -43,18 +43,6 @@ void snake::move(int direction) {
             body[0].x += SNAKE_SEGMENT_SIZE;
             break;
     }
-
-    // This loops the snake through the screen
-    if (body[0].x < 0) {
-        body[0].x += (int)(SCREEN_WIDTH / SNAKE_SEGMENT_SIZE * SNAKE_SEGMENT_SIZE);
-    } else if (body[0].x >= SCREEN_WIDTH) {
-        body[0].x -= (int)(SCREEN_WIDTH / SNAKE_SEGMENT_SIZE * SNAKE_SEGMENT_SIZE);
-    }
-    if (body[0].y < 0) {
-        body[0].y += (int)(SCREEN_HEIGHT / SNAKE_SEGMENT_SIZE * SNAKE_SEGMENT_SIZE);
-    } else if (body[0].y >= SCREEN_HEIGHT) {
-        body[0].y -= (int)(SCREEN_HEIGHT / SNAKE_SEGMENT_SIZE * SNAKE_SEGMENT_SIZE);
-    }
 }
 
 void snake::grow() {
@@ -91,7 +79,9 @@ bool snake::dead() {
 
 bool snake::needNewApple() {
     // Check if the head of the snake is on the apple
-    return (body[0].x == apple.x && body[0].y == apple.y);
+    SDL_FRect temp = body.front();
+    loop_coordinates(&temp.x, &temp.y);
+    return (temp.x == apple.x && temp.y == apple.y);
 }
 
 void snake::newApple() {
@@ -111,3 +101,18 @@ void snake::newApple() {
 }
 
 SDL_FRect *snake::getApple() { return &apple; }
+
+void loop_coordinates(float *x, float *y) {
+    while (*x < 0 || *x >= SCREEN_WIDTH || *y < 0 || *y >= SCREEN_HEIGHT) {
+        if (*x < 0) {
+            *x += (int)(SCREEN_WIDTH / SNAKE_SEGMENT_SIZE * SNAKE_SEGMENT_SIZE);
+        } else if (*x >= SCREEN_WIDTH) {
+            *x -= (int)(SCREEN_WIDTH / SNAKE_SEGMENT_SIZE * SNAKE_SEGMENT_SIZE);
+        }
+        if (*y < 0) {
+            *y += (int)(SCREEN_HEIGHT / SNAKE_SEGMENT_SIZE * SNAKE_SEGMENT_SIZE);
+        } else if (*y >= SCREEN_HEIGHT) {
+            *y -= (int)(SCREEN_HEIGHT / SNAKE_SEGMENT_SIZE * SNAKE_SEGMENT_SIZE);
+        }
+    }
+}

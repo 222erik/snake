@@ -19,11 +19,6 @@ static void render();
 
 static void delay();
 
-static void
-loop_coordinates(float *x,
-                 float *y); // This keeps the snake in frame, even though its cooirdinates
-                            // are outside of the screen (the snake loops in the walls)
-
 // Keeps track of the time
 int delta = 0;
 
@@ -309,20 +304,5 @@ static void delay(void) {
 
         frameCount = 0;
         lastFPSUpdate = currentTime;
-    }
-}
-
-static void loop_coordinates(float *x, float *y) {
-    while (*x < 0 || *x >= SCREEN_WIDTH || *y < 0 || *y >= SCREEN_HEIGHT) {
-        if (*x < 0) {
-            *x += (int)(SCREEN_WIDTH / SNAKE_SEGMENT_SIZE * SNAKE_SEGMENT_SIZE);
-        } else if (*x >= SCREEN_WIDTH) {
-            *x -= (int)(SCREEN_WIDTH / SNAKE_SEGMENT_SIZE * SNAKE_SEGMENT_SIZE);
-        }
-        if (*y < 0) {
-            *y += (int)(SCREEN_HEIGHT / SNAKE_SEGMENT_SIZE * SNAKE_SEGMENT_SIZE);
-        } else if (*y >= SCREEN_HEIGHT) {
-            *y -= (int)(SCREEN_HEIGHT / SNAKE_SEGMENT_SIZE * SNAKE_SEGMENT_SIZE);
-        }
     }
 }
