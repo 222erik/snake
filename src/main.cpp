@@ -37,6 +37,10 @@ const uint32_t targetFrameTime = 1000 / REFRESH_RATE;
 SDL_Window *window;
 SDL_Renderer *renderer;
 
+SDL_Texture *apple_texture;
+SDL_Texture *body_texture;
+SDL_Texture *head_texture;
+
 struct snake theSnake(SNAKE_INITIAL_LENGTH +
                       1); // One segment is added because the extended tail is added
 int main(int argc, char *argv[]) {
@@ -87,7 +91,7 @@ int main(int argc, char *argv[]) {
                 theSnake.move(direction);
 
                 if (theSnake.dead()) {
-                    printf("Game Over! Score: %d", score);
+                    printf("Game Over! Score: %d\n", score);
                     running = false;
                 }
 
@@ -130,6 +134,16 @@ static void init() {
     SDL_SetRenderVSync(renderer, 1); // V-sync is great!
 
     theSnake.newApple(); // Spawn apple
+
+    // Load textures
+    apple_texture = IMG_LoadTexture(renderer, "resources/apple.ppm");
+    SDL_SetTextureScaleMode(apple_texture, SDL_SCALEMODE_NEAREST);
+
+    body_texture = IMG_LoadTexture(renderer, "resources/snake_body.ppm");
+    SDL_SetTextureScaleMode(body_texture, SDL_SCALEMODE_NEAREST);
+
+    head_texture = IMG_LoadTexture(renderer, "resources/snake_head.ppm");
+    SDL_SetTextureScaleMode(head_texture, SDL_SCALEMODE_NEAREST);
 }
 
 static void render() {
@@ -139,17 +153,13 @@ static void render() {
 
     // Render the apple with the apple.ppm image
     SDL_FRect *apple_rect = theSnake.getApple();
-    SDL_Texture *apple_texture = IMG_LoadTexture(renderer, "resources/apple.ppm");
-    SDL_SetTextureScaleMode(apple_texture, SDL_SCALEMODE_NEAREST);
     SDL_RenderTexture(renderer, apple_texture, NULL, apple_rect);
     if (!apple_texture)
         fprintf(stderr, "Failed: %s", SDL_GetError());
 
     // These help to animate the snake
     float anim = (((float)delta / SPEED_OF_GAME) * SNAKE_SEGMENT_SIZE) - SNAKE_SEGMENT_SIZE;
-    float anim_body = anim + SNAKE_SEGMENT_SIZE;
 
-    SDL_FRect temp;
     std::vector<SDL_FRect> body = theSnake.getBody();
 
     // Render the snake
@@ -187,9 +197,6 @@ static void render() {
         }
         body_rects.push_back(body_segment_rect);
     }
-    SDL_Texture *body_texture = IMG_LoadTexture(renderer, "resources/snake_body.ppm");
-    SDL_SetTextureScaleMode(body_texture, SDL_SCALEMODE_NEAREST);
-
     SDL_FPoint center = {(float)SNAKE_SEGMENT_SIZE / 2,
                          (float)SNAKE_SEGMENT_SIZE / 2}; // The texture rotates around its center
     for (int i = 0; i < body_rects.size(); ++i) {
@@ -212,8 +219,6 @@ static void render() {
             head_rect.y -= anim;
         }
     }
-    SDL_Texture *head_texture = IMG_LoadTexture(renderer, "resources/snake_head.ppm");
-    SDL_SetTextureScaleMode(head_texture, SDL_SCALEMODE_NEAREST);
 
     int head_direction;
     switch (direction) {
