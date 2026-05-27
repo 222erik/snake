@@ -96,17 +96,3 @@ jobs:
         with:
           name: snake-windows
           path: snake-windows.zip
-
-  create-release:
-    needs: [build-linux, build-windows]
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    steps:
-      - uses: actions/download-artifact@v4
-      
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            snake-linux*/*
-            snake-windows*/*
