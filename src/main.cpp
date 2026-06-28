@@ -1,5 +1,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_error.h>
+#include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_oldnames.h>
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
@@ -7,6 +8,9 @@
 #include <SDL3_image/SDL_image.h>
 #include <cstdint>
 #include <cstdio>
+#include <filesystem>
+#include <iostream>
+#include <string>
 #include "snake.hpp"
 
 #define SPEED_OF_GAME 300 // Delay in milliseconds between each game update (lower is faster)
@@ -136,17 +140,28 @@ static void init() {
 
     theSnake.newApple(); // Spawn apple
 
+    // Locate the resource files
+    std::string base = std::string(SDL_GetBasePath()) + "..";
+    std::filesystem::path local = std::filesystem::path(base);
+    local = std::filesystem::path(local.string() + "/resources/");
+
+    if (std::filesystem::exists(local))
+        base = local.string();
+    else
+        base = std::string("/usr/share/snake-sdl3") +
+               "/resources/"; // This is when it's installed on the system
+
     // Load textures
-    apple_texture = IMG_LoadTexture(renderer, "resources/apple.ppm");
+    apple_texture = IMG_LoadTexture(renderer, (base + "apple.ppm").c_str());
     SDL_SetTextureScaleMode(apple_texture, SDL_SCALEMODE_NEAREST);
 
-    body_texture = IMG_LoadTexture(renderer, "resources/snake_body.ppm");
+    body_texture = IMG_LoadTexture(renderer, (base + "snake_body.ppm").c_str());
     SDL_SetTextureScaleMode(body_texture, SDL_SCALEMODE_NEAREST);
 
-    head_texture = IMG_LoadTexture(renderer, "resources/snake_head.ppm");
+    head_texture = IMG_LoadTexture(renderer, (base + "snake_head.ppm").c_str());
     SDL_SetTextureScaleMode(head_texture, SDL_SCALEMODE_NEAREST);
 
-    tail_texture = IMG_LoadTexture(renderer, "resources/snake_tail.ppm");
+    tail_texture = IMG_LoadTexture(renderer, (base + "snake_tail.ppm").c_str());
     SDL_SetTextureScaleMode(tail_texture, SDL_SCALEMODE_NEAREST);
 }
 
